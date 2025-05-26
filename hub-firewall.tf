@@ -50,6 +50,9 @@ resource "azurerm_firewall_policy" "azfirewall_policy" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   sku                 = "Standard"
+  dns {
+    proxy_enabled = true
+  }
 }
 
 resource "azurerm_firewall_policy_rule_collection_group" "example" {
@@ -79,8 +82,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "example" {
       source_addresses  = ["10.100.2.0/24"]
       destination_fqdns = ["*.microsoft.com"]
     }
-    //
-    
+    // Azure Monitor
     rule {
       name        = "APIM to Azure Monitor"
       description = "Allow access to azure monitor"
@@ -89,7 +91,18 @@ resource "azurerm_firewall_policy_rule_collection_group" "example" {
         port = 443
       }
       source_addresses  = ["10.100.2.0/24"]
-      destination_fqdns = ["gcs.prod.warm.ingestion.monitoring.azure.com"]
+      destination_fqdns = ["gcs.prod.warm.ingestion.monitoring.azure.com", "gcs.prod.monitoring.core.windows.net"]
+    }
+    // Azure active directory
+    rule {
+      name        = "APIM to Active Directory"
+      description = "Allow access to Azure Active Directory"
+      protocols {
+        type = "Https"
+        port = 443
+      }
+      source_addresses  = ["10.100.2.0/24"]
+      destination_fqdns = ["login.windows.net"]
     }
   }
 
@@ -125,6 +138,13 @@ resource "azurerm_firewall_policy_rule_collection_group" "example" {
       source_addresses      = ["10.100.2.0/24"]
       destination_ports     = ["12000"]
       destination_addresses = ["AzureMonitor"]
+    }
+    rule {
+      name                  = "allow-apim-metrics"
+      protocols             = ["TCP"]
+      source_addresses      = ["10.100.2.0/24"]
+      destination_ports     = ["1886"]
+      destination_fqdns     = ["prod3.prod.microsoftmetrics.com"]
     }
   }
 
