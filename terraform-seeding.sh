@@ -1,0 +1,5 @@
+# apply targeted resource to provision firewall and UDR first
+terraform plan -target=azurerm_firewall.azfirewall -target=azurerm_virtual_network_peering.hub_to_spoke -target=azurerm_virtual_network_peering.spoke_to_hub -target=azurerm_subnet_route_table_association.spoke_subnet_2_association -target=azurerm_monitor_diagnostic_setting.azfirewall
+
+
+terraform apply -target=azurerm_firewall.azfirewall -target=azurerm_virtual_network_peering.hub_to_spoke -target=azurerm_virtual_network_peering.spoke_to_hub -target=azurerm_subnet_route_table_association.spoke_subnet_2_association -target=azurerm_monitor_diagnostic_setting.azfirewall
